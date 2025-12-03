@@ -1,0 +1,82 @@
+#include "GameOverScreen.h"
+#include <SFML/Graphics.hpp>
+#include <string>
+using namespace std;
+#include <iostream>
+//NEEDS MASSIVE FIXINGGGG
+
+void GameOverScreen :: drawExitScreen(sf::RenderWindow& window)
+{
+    sf::Font font;
+    if (!font.loadFromFile("open-sauce.sans-black.ttf")){
+        cerr<<"Error loading font!"<<endl;
+        return;
+    }
+    
+    sf::Text title("Game Over", font, 40);
+    title.setPosition(280.f, 280.f);
+    title.setFillColor(sf::Color::Black);
+
+    sf::RectangleShape button(sf::Vector2f(150.f, 50.f));
+    button.setPosition(425.f,500.f);
+    button.setFillColor(sf::Color(200,200,200));
+
+    sf::Text buttonText("Quit", font, 24);
+    buttonText.setPosition(455.f,510.f);
+    buttonText.setFillColor(sf::Color::Black);
+
+    bool clicked = false;
+    sf::Clock timer;
+
+    // button.setSize(sf::Vector2f(150.f, 50.f));
+    // button.setPosition(b_start_x, b_start_y+(i*160));
+
+
+    while(window.isOpen())
+    {
+        sf::Event event;
+
+        while(window.pollEvent(event))
+        {
+            if (event.type==sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+            {
+                cout<<"Closed the Window"<<endl;
+                window.close();
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) 
+            {
+                sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+                sf::FloatRect buttonBounds = button.getGlobalBounds();
+                if (buttonBounds.contains(mousePos)) 
+                {
+                    clicked = true;
+                    timer.restart();    
+                    quitPressed=true;
+                }
+
+            }
+                
+        }
+
+            
+    
+
+        
+    if (clicked && timer.getElapsedTime().asSeconds() > 0.18f) 
+    {
+        clicked = false;
+    }
+        
+
+        window.clear(sf::Color(165, 184, 174));
+
+        window.draw(button);
+        window.draw(title);
+        window.draw(buttonText);
+        
+        window.display();
+
+    }
+
+}
