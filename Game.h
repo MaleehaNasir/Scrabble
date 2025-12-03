@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include "Board.h"
 
 using namespace std;
 
@@ -13,7 +14,7 @@ using namespace std;
 class Game 
 {
     // vector <Tile*> LetterBag;
-    // Board gameBoard;
+    Board gameBoard;
     // Player Player1;
     // Player Player2;
     void scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, int score2);
@@ -26,6 +27,7 @@ class Game
     
 
     public:
+    Game();
     void render(sf::RenderWindow& window);
     bool resignPressed=false;
     

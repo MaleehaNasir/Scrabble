@@ -30,14 +30,15 @@ int main()
         else if (state==ScreenState::GAME)
         {
             game.render(window);
-            if (game.resignPressed) state=ScreenState::GAME_OVER;
-            else window.close();
+            //if (game.resignPressed) state=ScreenState::GAME_OVER;
+            //else 
+            window.close();
         }
-        else if (state==ScreenState::GAME_OVER)
-        {
-            exit.drawExitScreen(window);
-            if (welcome.quitPressed) window.close();
-        }
+        // else if (state==ScreenState::GAME_OVER)
+        // {
+        //     exit.drawExitScreen(window);
+        //     if (welcome.quitPressed) window.close();
+        // }
         
 
     }

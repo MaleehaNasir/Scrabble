@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 using namespace std;
 #include <iostream>
+
+Game::Game(): gameBoard() {}
+
 void Game::render(sf::RenderWindow& window)
 {drawGameBoard(window);}
 
@@ -33,21 +36,21 @@ void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, in
 
 }
 
-void Game:: boardDisplay(sf::RenderWindow &window, sf::Font font, vector<string> &boardDimensions, sf::RectangleShape rectangle[255])
-{
+// Game:: boardDisplay(sf::RenderWindow &window, sf::Font font, vector<string> &boardDimensions, sf::RectangleShape rectangle[255])
+// {
 
-    for(int i=0; i<225; i++)
-    {
+//     for(int i=0; i<225; i++)
+//     {
         
-        window.draw(rectangle[i]);
+//         window.draw(rectangle[i]);
 
-        sf::Text text(boardDimensions[i], font, 18);
-        text.setPosition(rectangle[i].getPosition().x+3, rectangle[i].getPosition().y+7);
-        text.setFillColor(sf::Color::Black);
-        window.draw(text);
+//         sf::Text text(boardDimensions[i], font, 18);
+//         text.setPosition(rectangle[i].getPosition().x+3, rectangle[i].getPosition().y+7);
+//         text.setFillColor(sf::Color::Black);
+//         window.draw(text);
         
-    }
-}
+//     }
+// }
 
 void Game:: rackDisplay(sf::RenderWindow &window, sf::Font font, vector<char>&rackLetters, sf::RectangleShape rectangle[7])
 {
@@ -130,21 +133,12 @@ void Game::drawGameBoard(sf::RenderWindow &window)
 
     }
 
-    sf::RectangleShape boardTiles[255];
-    
-    int start_x=10;
-    int start_y=10;
-
-    for (int i =0; i<15;i++)
+    sf::RectangleShape boardTiles[225];
+    for (int i = 0; i < 15; i++) 
     {
-        for (int j =0; j<15;j++)
-        {
-            boardTiles[i*15+j].setSize(sf::Vector2f(40.f, 40.f));
-            boardTiles[i*15+j].setPosition(start_x+(j*44), start_y+(i*44));
-        }
+        for (int j = 0; j < 15; j++) 
+        {boardTiles[i*15 + j] = gameBoard.getTileInfo(i, j);}
     }
-    
-    
 
     while(window.isOpen())
     {
@@ -194,7 +188,6 @@ void Game::drawGameBoard(sf::RenderWindow &window)
                                 return;
                                 break;
                             default:
-                                // Optional: Handle unexpected i
                                 break;
                         }
                     }
@@ -214,7 +207,13 @@ void Game::drawGameBoard(sf::RenderWindow &window)
                             {
                                 sf::FloatRect boardTileBounds = boardTiles[a].getGlobalBounds();
                                 if (boardTileBounds.contains(mousePos)) 
-                                {rectangle[i].setPosition(boardTiles[a].getPosition()); break;}
+                                {
+                                    rectangle[i].setPosition(boardTiles[a].getPosition()); 
+                                    int row = a / 15;  
+                                    int col = a % 15;
+                                    gameBoard.setLetter(row, col, rackLets[i]);
+                                    break;
+                                }
                                 else 
                                 {rectangle[i].setPosition(ogPositionsx[i], ogPositionsy[i]);}
                             }
@@ -247,9 +246,28 @@ void Game::drawGameBoard(sf::RenderWindow &window)
         }
 
         window.clear(sf::Color(165, 184, 174));
+        
+        for (int i =0; i<15;i++)
+        {
+            for (int j =0; j<15;j++)
+            {
+                sf::RectangleShape tile = gameBoard.getTileInfo(i, j);
+                window.draw(tile);
 
+                if (!gameBoard.isEmpty(i, j)) 
+                {
+                sf::Text letterText;
+                letterText.setFont(font);   // font loaded earlier
+                letterText.setString(std::string(1, gameBoard.getLetter(i, j)));
+                letterText.setCharacterSize(24);
+                letterText.setFillColor(sf::Color::Black);
+                letterText.setPosition(tile.getPosition().x + 10, tile.getPosition().y + 5);
+                window.draw(letterText);
+                }
+            }
+        }
         scoreDisplay(window, font, 34, 68);
-        boardDisplay(window, font, boardDims, boardTiles);
+        // boardDisplay(window, font, boardDims, boardTiles);
         rackDisplay(window, font, rackLets, rectangle);
         buttonDisplay(window, font, buttons, labels, clicked);
 

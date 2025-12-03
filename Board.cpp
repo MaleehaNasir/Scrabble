@@ -16,7 +16,7 @@ Board::Board()
             coordinates p;
             p.x=start_x+(j*44.f);
             p.y=start_y+(i*44.f);
-                
+            
             //TRIPLE WORD
             if((i==0&&(j==0||j==7||j==14))   ||   (i==7&&(j==0||j==14))   || (i==14&&(j==0||j==7||j==14)))
             {
@@ -25,7 +25,7 @@ Board::Board()
             }
 
             //DOUBLE WORD
-            else if (i==j && ((i>=1 && i<=4)||(i>=10 && i<=14))) || (i==14-j && ((i>=1 && i<=4)||(i>=10 && i<=14)))
+            else if ((i==j && ((i>=1 && i<=4)||(i>=10 && i<=14)))   ||   (i==14-j && ((i>=1 && i<=4)||(i>=10 && i<=14))))
             {
                 grid[i][j]=BoardSquares(2, DW, true, p, sf::Color::Magenta);
             }
@@ -43,14 +43,47 @@ Board::Board()
             }
 
             else
-            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color::White);}
+            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(223,223,225));}
     
         }
 
     }
 }
 
-void Board :: drawGameBoard(sf::RenderWindow &window, sf::Font font, vector<string> &boardDimensions)
+void Board::setLetter(int row, int col, char l)
+{grid[row][col].setLetter(l);}
+
+char Board::getLetter(int row, int col) 
+{return grid[row][col].getLetter();}
+
+bool Board::isEmpty(int row, int col) const {return grid[row][col].isEmpty();}
+
+string Board::getTypeText(BoardSquares &square)
 {
+
+    if (square.getType()==TW){return "TW";}
+    else if (square.getType()==DW){return "DW";}
+    else if (square.getType()==TL){return "TL";}
+    else if (square.getType()==DL){return "DL";}
+    else return "";
+
+}
+
+sf::RectangleShape Board:: getTileInfo(int row, int col)
+{
+    sf::RectangleShape square;
+    square.setSize(sf::Vector2f(40.f,40.f));
+    square.setFillColor(grid[row][col].getClr());
+    square.setPosition(grid[row][col].getX(), grid[row][col].getY());
+
+    if (grid[row][col].isEmpty()) 
+    {
+        sf::Text text;
+        text.setString(std::string(1, grid[row][col].getLetter()));
+        text.setPosition(square.getPosition().x+10, square.getPosition().y+5);
     
+    }
+
+    return square;
+
 }
