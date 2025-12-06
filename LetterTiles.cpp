@@ -2,13 +2,13 @@
 #include <cctype>
 
 LetterTiles::LetterTiles() : letter('\0'), letter_points(0), isBlank(false) {
-    tileRect.setSize(sf::Vector2f(40.f, 40.f));
-    tileRect.setFillColor(sf::Color(245, 222, 179)); // Beige color for tiles
 }
 
-LetterTiles::LetterTiles(char l) : letter(toupper(l)), isBlank(l == ' ') {
-    tileRect.setSize(sf::Vector2f(40.f, 40.f));
-    tileRect.setFillColor(sf::Color(245, 222, 179));
+LetterTiles::LetterTiles(char l) 
+{
+
+    letter=toupper(l);
+    isBlank=l==' ';
     
     switch(toupper(l)) {
         case 'A': case 'E': case 'I': case 'O': case 'U': case 'L': 
@@ -41,11 +41,14 @@ char LetterTiles::getLetter() const { return letter; }
 void LetterTiles::setPosition(float x, float y) {
     position.x = x;
     position.y = y;
-    tileRect.setPosition(x, y);
+    letterTileSprite.setPosition(x, y);
 }
 
 sf::Vector2f LetterTiles::getPosition() const { return position; }
 
-sf::RectangleShape& LetterTiles::getTileRect() { return tileRect; }
+sf::Sprite& LetterTiles::getSprite() {return letterTileSprite;}
+
+void LetterTiles:: setSprite(const sf::Texture& texture) {letterTileSprite.setTexture(texture);}
+
 
 bool LetterTiles::getIsBlank() const { return isBlank; }

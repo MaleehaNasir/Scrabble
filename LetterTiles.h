@@ -5,7 +5,7 @@
 class LetterTiles {
     char letter;
     int letter_points;
-    sf::RectangleShape tileRect;
+    sf::Sprite letterTileSprite;
     sf::Vector2f position;
     bool isBlank; 
     
@@ -16,7 +16,8 @@ public:
     char getLetter() const;
     void setPosition(float x, float y);
     sf::Vector2f getPosition() const;
-    sf::RectangleShape& getTileRect();
+    sf::Sprite& getSprite();
+    void setSprite(const sf::Texture& texture);
     bool getIsBlank() const;
 };
 

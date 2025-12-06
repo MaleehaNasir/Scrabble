@@ -32,3 +32,5 @@ float BoardSquares::getY(){return position.y;}
 sf::Color BoardSquares:: getClr() {return colour;}
 char BoardSquares::getLetter(){return letter;}
 void BoardSquares::setLetter(char l) {letter = l; empty = false;} 
+
+
