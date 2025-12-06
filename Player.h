@@ -1,15 +1,31 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+
+#include "LetterTiles.h"
+#include "LetterBag.h"
+#include <vector>
 using namespace std;
 
-class Player{
-
+class Player {
+private:
     int score;
-    vector <Tile*> Rack;
+    vector<LetterTiles*> rack;   
     bool turn;
 
-    public:
+public:
+    Player();
     void setScore(int s);
     int getScore();
-    void pushToRack(vector<Tile*> newLetters);
-    vector<Tile*> getRackLetters();   
+
+    void addToRack(LetterTiles* tile);
+    void fillRack(LetterBag& bag);
+
+    std::vector<LetterTiles*>& getRack();
+
+    void removeTileFromRack(int index);
+
+    bool isTurn() const;
+    void setTurn(bool t);
 };
 
+#endif

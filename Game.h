@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 #include "Board.h"
+#include "Player.h"
+#include "LetterBag.h"
 
 using namespace std;
 
@@ -13,10 +15,11 @@ using namespace std;
 
 class Game 
 {
-    // vector <Tile*> LetterBag;
+    LetterBag tileBag;
     Board gameBoard;
-    // Player Player1;
-    // Player Player2;
+    Player Player1;
+    Player Player2;
+    Player* currentPlayer;
     void scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, int score2);
     void boardDisplay(sf::RenderWindow &window, sf::Font font, vector<string> &boardDimensions, sf::RectangleShape rectangle[255]);
     void rackDisplay(sf::RenderWindow &window, sf::Font font, vector<char>&rackLetters, sf::RectangleShape rectangle[7]);

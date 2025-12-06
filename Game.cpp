@@ -36,22 +36,6 @@ void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, in
 
 }
 
-// Game:: boardDisplay(sf::RenderWindow &window, sf::Font font, vector<string> &boardDimensions, sf::RectangleShape rectangle[255])
-// {
-
-//     for(int i=0; i<225; i++)
-//     {
-        
-//         window.draw(rectangle[i]);
-
-//         sf::Text text(boardDimensions[i], font, 18);
-//         text.setPosition(rectangle[i].getPosition().x+3, rectangle[i].getPosition().y+7);
-//         text.setFillColor(sf::Color::Black);
-//         window.draw(text);
-        
-//     }
-// }
-
 void Game:: rackDisplay(sf::RenderWindow &window, sf::Font font, vector<char>&rackLetters, sf::RectangleShape rectangle[7])
 {
     
@@ -211,7 +195,6 @@ void Game::drawGameBoard(sf::RenderWindow &window)
                                     rectangle[i].setPosition(boardTiles[a].getPosition()); 
                                     int row = a / 15;  
                                     int col = a % 15;
-                                    gameBoard.setLetter(row, col, rackLets[i]);
                                     break;
                                 }
                                 else 
@@ -254,20 +237,19 @@ void Game::drawGameBoard(sf::RenderWindow &window)
                 sf::RectangleShape tile = gameBoard.getTileInfo(i, j);
                 window.draw(tile);
 
-                if (!gameBoard.isEmpty(i, j)) 
-                {
-                sf::Text letterText;
-                letterText.setFont(font);   // font loaded earlier
-                letterText.setString(std::string(1, gameBoard.getLetter(i, j)));
-                letterText.setCharacterSize(24);
-                letterText.setFillColor(sf::Color::Black);
-                letterText.setPosition(tile.getPosition().x + 10, tile.getPosition().y + 5);
-                window.draw(letterText);
-                }
+                // if (!gameBoard.isEmpty(i, j)) 
+                // {
+                // sf::Text letterText;
+                // letterText.setFont(font);   // font loaded earlier
+                // letterText.setString(std::string(1, gameBoard.getLetter(i, j)));
+                // letterText.setCharacterSize(24);
+                // letterText.setFillColor(sf::Color::Black);
+                // letterText.setPosition(tile.getPosition().x + 10, tile.getPosition().y + 5);
+                // window.draw(letterText);
+                // }
             }
         }
         scoreDisplay(window, font, 34, 68);
-        // boardDisplay(window, font, boardDims, boardTiles);
         rackDisplay(window, font, rackLets, rectangle);
         buttonDisplay(window, font, buttons, labels, clicked);
 
