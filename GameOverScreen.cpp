@@ -5,7 +5,8 @@ using namespace std;
 #include <iostream>
 //NEEDS MASSIVE FIXINGGGG
 
-void GameOverScreen :: drawExitScreen(sf::RenderWindow& window)
+
+void GameOverScreen :: drawExitScreen(sf::RenderWindow& window, int score1, int score2)
 {
     sf::Font font;
     if (!font.loadFromFile("open-sauce.sans-black.ttf")){
@@ -14,8 +15,25 @@ void GameOverScreen :: drawExitScreen(sf::RenderWindow& window)
     }
     
     sf::Text title("Game Over", font, 40);
-    title.setPosition(280.f, 280.f);
+    title.setPosition(280.f, 240.f);
     title.setFillColor(sf::Color::Black);
+
+    sf::Text p1("Player 1:  "+ to_string(score1), font,28);
+    p1.setPosition(300.f,320.f);
+    p1.setFillColor(sf::Color::Black);
+
+    sf::Text p2("Player 2:  "+ to_string(score2), font,28);
+    p2.setPosition(300.f,360.f);
+    p2.setFillColor(sf::Color::Black);
+
+    string result= 
+        (score1>score2)?"Winner: Player 1": 
+        (score2>score1)?"Winner: Player 2": "Tie!";
+
+    sf::Text res(result, font, 32);
+    res.setPosition(300.f, 420.f);
+    res.setFillColor(sf::Color(20, 120, 20));
+
 
     sf::RectangleShape button(sf::Vector2f(150.f, 50.f));
     button.setPosition(425.f,500.f);
@@ -59,10 +77,6 @@ void GameOverScreen :: drawExitScreen(sf::RenderWindow& window)
                 
         }
 
-            
-    
-
-        
     if (clicked && timer.getElapsedTime().asSeconds() > 0.18f) 
     {
         clicked = false;
@@ -70,12 +84,22 @@ void GameOverScreen :: drawExitScreen(sf::RenderWindow& window)
         
 
         window.clear(sf::Color(165, 184, 174));
-
-        window.draw(button);
         window.draw(title);
+
+        if (clicked) {button.setFillColor(sf::Color(220, 220, 220));} 
+        else {button.setFillColor(sf::Color(255, 255, 255));}
+
+        window.draw(p1);
+        window.draw(p2);
+        window.draw(res);
+        window.draw(button);
         window.draw(buttonText);
         
         window.display();
+
+        if(quitPressed){
+            return;
+        }
 
     }
 

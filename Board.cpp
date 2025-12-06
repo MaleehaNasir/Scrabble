@@ -85,5 +85,4 @@ sf::RectangleShape Board:: getTileInfo(int row, int col)
     }
 
     return square;
-
 }

@@ -3,7 +3,15 @@
 using namespace std;
 #include <iostream>
 
-Game::Game(): gameBoard() {}
+Game::Game(): gameBoard(), letterBag() 
+{
+    currentPlayer = &player1;
+    player1.setTurn(true);
+    player2.setTurn(false);
+    
+    player1.fillRack(letterBag);
+    player2.fillRack(letterBag);
+}
 
 void Game::render(sf::RenderWindow& window)
 {drawGameBoard(window);}
@@ -36,35 +44,30 @@ void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, in
 
 }
 
-// Game:: boardDisplay(sf::RenderWindow &window, sf::Font font, vector<string> &boardDimensions, sf::RectangleShape rectangle[255])
-// {
-
-//     for(int i=0; i<225; i++)
-//     {
-        
-//         window.draw(rectangle[i]);
-
-//         sf::Text text(boardDimensions[i], font, 18);
-//         text.setPosition(rectangle[i].getPosition().x+3, rectangle[i].getPosition().y+7);
-//         text.setFillColor(sf::Color::Black);
-//         window.draw(text);
-        
-//     }
-// }
-
-void Game:: rackDisplay(sf::RenderWindow &window, sf::Font font, vector<char>&rackLetters, sf::RectangleShape rectangle[7])
+void Game::rackDisplay(sf::RenderWindow &window, sf::Font font, vector<LetterTiles*>&rackLetters, sf::RectangleShape rectangle[7])
 {
-    
+    for (int i=0; i<rackLetters.size() && i<7; i++)
+    {
+        window.draw(rectangle[i]);
 
-    for (int i=0; i<7; i++)
-        {
-            window.draw(rectangle[i]);
-
-            sf::Text text(rackLetters[i], font, 18);
-            text.setPosition(rectangle[i].getPosition().x+10, rectangle[i].getPosition().y+7);
-            text.setFillColor(sf::Color::Black);
-            window.draw(text);
+        if (rackLetters[i] != nullptr) {
+            sf::Text letterText;
+            letterText.setFont(font);
+            letterText.setString(string(1, rackLetters[i]->getLetter()));
+            letterText.setCharacterSize(18);
+            letterText.setPosition(rectangle[i].getPosition().x+10, rectangle[i].getPosition().y+7);
+            letterText.setFillColor(sf::Color::Black);
+            window.draw(letterText);
+            
+            sf::Text pointsText;
+            pointsText.setFont(font);
+            pointsText.setString(to_string(rackLetters[i]->getLetterPoints()));
+            pointsText.setCharacterSize(12);  
+            pointsText.setPosition(rectangle[i].getPosition().x+26, rectangle[i].getPosition().y+24);
+            pointsText.setFillColor(sf::Color::Black);
+            window.draw(pointsText);
         }
+    }
 }
 
 void Game::buttonDisplay(sf::RenderWindow &window, sf::Font font, sf::RectangleShape buttons[4], string labels[4], bool clicked[4])
@@ -98,12 +101,11 @@ void Game::drawGameBoard(sf::RenderWindow &window)
 
     sf::Vector2f dragOffset[7];
 
+    vector<LetterTiles*>& playerRack = currentPlayer->getRack();
+
     vector<string> boardDims(225);
     for (int i = 0; i<225; i++)
     {boardDims[i]=to_string(i);}
-
-
-    vector<char>rackLets={'a', 'b', 'c', 'd', 'e', 'f', 'g'};
     
     bool clicked[4] = {false, false, false, false};
     sf::Clock timer[4];
@@ -211,7 +213,7 @@ void Game::drawGameBoard(sf::RenderWindow &window)
                                     rectangle[i].setPosition(boardTiles[a].getPosition()); 
                                     int row = a / 15;  
                                     int col = a % 15;
-                                    gameBoard.setLetter(row, col, rackLets[i]);
+                                    gameBoard.setLetter(row, col, playerRack[i]->getLetter());
                                     break;
                                 }
                                 else 
@@ -267,8 +269,7 @@ void Game::drawGameBoard(sf::RenderWindow &window)
             }
         }
         scoreDisplay(window, font, 34, 68);
-        // boardDisplay(window, font, boardDims, boardTiles);
-        rackDisplay(window, font, rackLets, rectangle);
+        rackDisplay(window, font, playerRack, rectangle);
         buttonDisplay(window, font, buttons, labels, clicked);
 
         
