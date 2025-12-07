@@ -23,6 +23,7 @@ class BoardSquares{
     BoardSquares();
     BoardSquares(int m, square_type t, bool isE, coordinates pos, sf::Color c);
     bool isEmpty() const;
+    void setEmpty(bool e);
     int getMultiplier();
     square_type getType();
     float getX();

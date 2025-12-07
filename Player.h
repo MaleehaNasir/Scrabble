@@ -1,6 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-
+#include <SFML/Graphics.hpp>
 #include "LetterTiles.h"
 #include "LetterBag.h"
 #include <vector>
@@ -14,11 +14,12 @@ private:
 
 public:
     Player();
-    void setScore(int s);
+    ~Player();
+    void incScore(int s);
     int getScore();
 
-    void addToRack(LetterTiles* tile);
-    void fillRack(LetterBag& bag);
+    void addToRack(LetterTiles* tile, sf::Texture tilesKeTextures[]);
+    void fillRack(LetterBag& bag, sf::Texture tilesKeTextures[]);
 
     std::vector<LetterTiles*>& getRack();
 

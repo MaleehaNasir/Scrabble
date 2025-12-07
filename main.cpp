@@ -2,13 +2,11 @@
 #include <SFML/Graphics.hpp>
 using namespace std;
 #include "Game.h"
+#include "GameMaster.h"
 
-int main(){
-
-    Game game;
-
-    game.render();
-
-    return 0;
+int main()
+{
+    GameMaster game;
+    game.run();
 
 }

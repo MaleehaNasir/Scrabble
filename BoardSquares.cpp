@@ -25,6 +25,7 @@ BoardSquares::BoardSquares(int m, square_type t, bool isE, coordinates pos, sf::
 }
 
 bool BoardSquares::isEmpty() const {return empty;}
+void BoardSquares::setEmpty(bool e){empty=e;}
 int BoardSquares::getMultiplier(){return multiplier;}
 square_type BoardSquares::getType(){return type;}
 float BoardSquares::getX(){return position.x;}

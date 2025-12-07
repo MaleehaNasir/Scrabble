@@ -51,8 +51,10 @@ LetterBag::~LetterBag()
 LetterTiles* LetterBag::drawTile() 
 {
     if (tiles.empty()) {return nullptr;}
+
     LetterTiles* tile = tiles.back();
     tiles.pop_back();
+    
     return tile;
 }
 
