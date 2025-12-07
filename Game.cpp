@@ -5,7 +5,7 @@ using namespace std;
 
 sf::Texture tilesKeTextures[27];
 sf::Sprite rackSprites[7];
-sf::Vector2f rackPositions[7];
+
 
 void Game::loadTextures()//load all the textures for the sprites
 {
@@ -18,6 +18,38 @@ void Game::loadTextures()//load all the textures for the sprites
     }
     
     tilesKeTextures[26].loadFromFile("letterTiles/Blank.png");
+}
+
+void Game:: switchPlayer()
+{
+    currentPlayer=(currentPlayer==&Player1)?&Player2 : &Player1;
+
+    currentPlayer->getRack() = currentPlayer->getRack();
+    
+    for (int i = 0; i < currentPlayer->getRack().size(); i++)
+    {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
+
+
+}
+
+void Game::playerDisplay(sf::RenderWindow &window, sf::Font& font, int player)
+{
+
+    sf::Text currPlayerLabel = sf::Text("Currently Playing: ", font, 28);
+    sf::Text currPlayer("", font, 26);
+    if (player ==1) currPlayer.setString("Player 1");
+    else currPlayer.setString("Player 2");
+    
+
+    currPlayerLabel.setFillColor(sf::Color::White);
+    currPlayer.setFillColor(sf::Color::White);
+
+    currPlayerLabel.setPosition(740,350);
+    currPlayer.setPosition(780, 400);
+
+    window.draw(currPlayerLabel);
+    window.draw(currPlayer);
+
 }
 
 Game::Game() : Player1(), Player2(), gameBoard(), tileBag()
@@ -33,7 +65,34 @@ Game::Game() : Player1(), Player2(), gameBoard(), tileBag()
     
     resignPressed=false;
 
+    font.loadFromFile("open-sauce.sans-black.ttf");
+    for (int i =0; i<7; i++){isDragging[i] = false;}
 
+    for (int i =0; i<4; i++){clicked[i] = false;};
+
+    int b_start_x=20;
+    int b_start_y=780;
+    for (int i=0; i<4; i++)
+    {
+        buttons[i].setSize(sf::Vector2f(120.f, 40.f));
+        buttons[i].setPosition(b_start_x+(i*150), b_start_y);
+
+    }
+
+    for (int i = 0; i < 15; i++) 
+    {
+        for (int j = 0; j < 15; j++) 
+        {boardTiles[i*15 + j] = gameBoard.getTileInfo(i, j);}
+    }
+
+
+    float r_start_x = 10;
+    float r_start_y = 690;
+    for (int i = 0; i < currentPlayer->getRack().size(); i++)
+    {
+        rackPositions[i] = sf::Vector2f(r_start_x + i*45, r_start_y);
+        currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);  // Set initial position
+    }
 }
 
 vector<int> Game::getFinalScores() //to pass to gameover screen so that players can stay private otherwise 
@@ -44,7 +103,7 @@ vector<int> Game::getFinalScores() //to pass to gameover screen so that players 
     return scores;
 }
 
-void Game::buttonDisplay(sf::RenderWindow &window, sf::Font font, sf::RectangleShape buttons[4], string labels[4], bool clicked[4])
+void Game::buttonDisplay(sf::RenderWindow &window, sf::Font& font, sf::RectangleShape buttons[4], string labels[4], bool clicked[4])
 {
        
     for (int i =0; i<4; i++)
@@ -66,7 +125,7 @@ void Game::buttonDisplay(sf::RenderWindow &window, sf::Font font, sf::RectangleS
         }
 }
 
-void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, int score2)
+void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font& font, int score1, int score2)
 {
     sf::Text player1 = sf::Text("Player 1: ", font, 24);
     sf::Text score1_display = sf::Text(to_string(score1), font, 24);
@@ -94,7 +153,7 @@ void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font font, int score1, in
 
 }
 
-void Game:: rackDisplay(sf::RenderWindow &window, sf::Font font, vector<LetterTiles*>&rackLetters)
+void Game:: rackDisplay(sf::RenderWindow &window, sf::Font& font, vector<LetterTiles*>&rackLetters)
 {
 
     for (int i=0; i<rackLetters.size(); i++)
@@ -104,55 +163,9 @@ void Game:: rackDisplay(sf::RenderWindow &window, sf::Font font, vector<LetterTi
     }
 }
 
-void Game::drawGameScreen(sf::RenderWindow &window)
+void Game::processEvents(sf::RenderWindow &window)
 {
-
-    sf::Font font;
-    font.loadFromFile("open-sauce.sans-black.ttf");
-    bool isDragging[7] = {false,false,false,false,false,false,false};
-
-    sf::Vector2f dragOffset[7];
-
-    vector<LetterTiles*>& currentRack= currentPlayer->getRack();
-
-    vector<string> boardDims(225);
-    for (int i = 0; i<225; i++)
-    {boardDims[i]=to_string(i);}
-    
-    bool clicked[4] = {false, false, false, false};
-    sf::Clock timer[4];
-
-    string labels[4]={"Submit", "Swap", "Resign", "Pass"};
-    sf::RectangleShape buttons[4];
-    int b_start_x=20;
-    int b_start_y=780;
-    for (int i=0; i<4; i++)
-    {
-        buttons[i].setSize(sf::Vector2f(120.f, 40.f));
-        buttons[i].setPosition(b_start_x+(i*150), b_start_y);
-
-    }
-
-    sf::RectangleShape boardTiles[225];
-    for (int i = 0; i < 15; i++) 
-    {
-        for (int j = 0; j < 15; j++) 
-        {boardTiles[i*15 + j] = gameBoard.getTileInfo(i, j);}
-    }
-
-
-    float r_start_x = 10;
-    float r_start_y = 690;
-    for (int i = 0; i < currentRack.size(); i++)
-    {
-        rackPositions[i] = sf::Vector2f(r_start_x + i*45, r_start_y);
-        currentRack[i]->getSprite().setPosition(rackPositions[i]);  // Set initial position
-    }
-
-    
-    while(window.isOpen())
-    {
-        sf::Event event;
+    sf::Event event;
 
         while(window.pollEvent(event))
         {
@@ -166,13 +179,13 @@ void Game::drawGameScreen(sf::RenderWindow &window)
             {
                 sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
                 
-                for (int i=0; i<currentRack.size();i++)
+                for (int i=0; i<currentPlayer->getRack().size();i++)
                 {
-                    sf::FloatRect rackLetterBounds = currentRack[i]->getSprite().getGlobalBounds();
+                    sf::FloatRect rackLetterBounds = currentPlayer->getRack()[i]->getSprite().getGlobalBounds();
                     if (rackLetterBounds.contains(mousePos)) //TODO: add the and if empty 
                     {
                         isDragging[i]=true;
-                        dragOffset[i]=  mousePos-currentRack[i]->getSprite().getPosition();
+                        dragOffset[i]=  mousePos-currentPlayer->getRack()[i]->getSprite().getPosition();
                     }
 
                 }
@@ -187,18 +200,25 @@ void Game::drawGameScreen(sf::RenderWindow &window)
                         std::cout << labels[i] << " clicked! TODO: Add game." << labels[i] << "();" << std::endl;
                         switch (i) 
                         {
-                            // case 0:  
-                            //     // game.Swap();  // Or whatever your method is
+                            // case 0:  //submit
+                            //     currentPlayer->getRack()=game.Swap(currentPlayer->getRack());  // Or whatever your method is
                             //     break;
-                            // case 1:  // Pass
-                            //     // game.Pass();
-                            //     break;
+                            case 1: //swap
+                                switchPlayer();
+                                break;
+                            
                             case 2:  // Resign
                                 resignPressed=true;
                                 return;
                                 break;
+
+                            case 3:
+                                switchPlayer();
+                                break;
+
                             default:
                                 break;
+                            
                         }
                     }
                 }
@@ -208,7 +228,7 @@ void Game::drawGameScreen(sf::RenderWindow &window)
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    for (int i=0; i<currentRack.size(); i++)
+                    for (int i=0; i<currentPlayer->getRack().size(); i++)
                     {   
                         if (isDragging[i])
                         {
@@ -221,12 +241,12 @@ void Game::drawGameScreen(sf::RenderWindow &window)
                                 sf::FloatRect boardTileBounds = boardTiles[a].getGlobalBounds();
                                 if (boardTileBounds.contains(mousePos)&& gameBoard.isEmpty(row, col)) 
                                 {
-                                    currentRack[i]->getSprite().setPosition(boardTiles[a].getPosition()); 
+                                    currentPlayer->getRack()[i]->getSprite().setPosition(boardTiles[a].getPosition()); 
                                     gameBoard.setEmpty(row, col, false);
                                     break;
                                 }
                                 else 
-                                {currentRack[i]->getSprite().setPosition(rackPositions[i]); gameBoard.setEmpty(row, col, true);}
+                                {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]); gameBoard.setEmpty(row, col, true);}
                             }
                         }
                         isDragging[i] = false;
@@ -236,12 +256,12 @@ void Game::drawGameScreen(sf::RenderWindow &window)
 
             if (event.type == sf::Event::MouseMoved)
             {
-                for (int i =0; i<currentRack.size();i++)
+                for (int i =0; i<currentPlayer->getRack().size();i++)
                 {
                     if (isDragging[i])
                     {
                         sf::Vector2f mousePos(event.mouseMove.x, event.mouseMove.y);
-                        currentRack[i]->getSprite().setPosition(mousePos - dragOffset[i]); 
+                        currentPlayer->getRack()[i]->getSprite().setPosition(mousePos - dragOffset[i]); 
                     }
                 }
             }
@@ -249,14 +269,22 @@ void Game::drawGameScreen(sf::RenderWindow &window)
             
         }
 
-        for (int i = 0; i <4; ++i) 
+        
+}
+
+void Game::update()
+{
+    for (int i = 0; i <4; ++i) 
         {
             if (clicked[i] && timer[i].getElapsedTime().asSeconds() > 0.18f) {
                 clicked[i] = false;
             }
         }
+}
 
-        window.clear(sf::Color(165, 184, 174));
+void Game::render(sf::RenderWindow &window)
+{
+    window.clear(sf::Color(165, 184, 174));
         
         for (int i =0; i<15;i++)
         {
@@ -277,12 +305,25 @@ void Game::drawGameScreen(sf::RenderWindow &window)
                 // }
             }
         }
+
+        
         scoreDisplay(window, font, Player1.getScore(), Player2.getScore());
-        rackDisplay(window, font, currentRack);
+        rackDisplay(window, font, currentPlayer->getRack());
         buttonDisplay(window, font, buttons, labels, clicked);
+        int p = currentPlayer==&Player1?1:2; //pass 1 if player one playing else player 2
+        playerDisplay(window, font, p);
 
         
         window.display();
+}
 
+void Game::drawGameScreen(sf::RenderWindow &window)
+{
+
+    while(window.isOpen())
+    {
+        processEvents(window);
+        update();      
+        render(window);
     }
 }
