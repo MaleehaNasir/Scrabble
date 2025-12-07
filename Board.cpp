@@ -18,7 +18,7 @@ Board::Board()
             p.y=start_y+(i*44.f);
             
             if (i==7&&j==7) //CENTER
-            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(110,110,110));}
+            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(182, 101, 96, 220));}
 
             //TRIPLE WORD
             else if((i==0&&(j==0||j==7||j==14))   ||   (i==7&&(j==0||j==14))   || (i==14&&(j==0||j==7||j==14)))

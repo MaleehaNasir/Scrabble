@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "SoundManager.h"
 #include <SFML/Graphics.hpp>
 using namespace std;
 #include <iostream>
@@ -244,6 +245,7 @@ void Game::processEvents(sf::RenderWindow &window)
                     if (rackLetterBounds.contains(mousePos)) 
                     {
                         sf::Vector2f tilePos = currentPlayer->getRack()[i]->getSprite().getPosition();
+                        SoundManager::get().playSound("tile_pickup",90.f);
                         isDragging[i]=true;
                         dragOffset[i]=  mousePos-currentPlayer->getRack()[i]->getSprite().getPosition();
 
@@ -281,24 +283,28 @@ void Game::processEvents(sf::RenderWindow &window)
                     sf::FloatRect buttonBounds = buttons[i].getGlobalBounds();
                     if (buttonBounds.contains(mousePos)) 
                     {
+                        SoundManager::get().playSound("click",100.f);
                         clicked[i] = true;
                         timer[i].restart();
-                        std::cout << labels[i] << " clicked! TODO: Add game." << labels[i] << "();" << std::endl;
                         switch (i) 
                         {
                             case 0:  //submit
                                 submitMove();
+                                SoundManager::get().playSound("submit_ok", 85.f);
                                 break;
                             case 1: //swap
                                 //swaptilesfunction implement karo 
+                                SoundManager::get().playSound("swap",80.f);
                                 break;
                             
                             case 2:  // Resign
+                                SoundManager::get().playSound("resign",100.f);
                                 resignPressed=true;
                                 return;
                                 break;
 
                             case 3:
+                                SoundManager::get().playSound("pass",90.f);
                                 switchPlayer();
                                 break;
 
@@ -337,6 +343,7 @@ void Game::processEvents(sf::RenderWindow &window)
                                     tempTile.letter=currentPlayer->getRack()[i]->getLetter();
                                     currentMove.tempPlacedTiles.push_back(tempTile);
                                     placed=true;
+                                    SoundManager::get().playSound("tile_place",95.f);
 
                                     break;
                                 }
@@ -412,6 +419,7 @@ void Game::drawGameScreen(sf::RenderWindow &window)
         if (resignPressed){return;}
         update();      
         render(window);
+        SoundManager::get().update();
         
     }        
 }

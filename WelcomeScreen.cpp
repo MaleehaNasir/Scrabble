@@ -1,4 +1,5 @@
 #include "WelcomeScreen.h"
+#include "SoundManager.h"
 #include <SFML/Graphics.hpp>
 #include <string>
 using namespace std;
@@ -68,6 +69,7 @@ void WelcomeScreen :: drawMainScreen(sf::RenderWindow& window)
                     sf::FloatRect buttonBounds = buttons[i].getGlobalBounds();
                     if (buttonBounds.contains(mousePos)) 
                     {
+                        SoundManager::get().playSound("click");
                         clicked[i] = true;
                         timer[i].restart();
                         switch (i) 
@@ -97,7 +99,8 @@ void WelcomeScreen :: drawMainScreen(sf::RenderWindow& window)
                 clicked[i] = false;
             }
         }
-
+        
+        SoundManager::get().update();
         window.clear(sf::Color(165, 184, 174));
 
         buttonDisplay(window, font, buttons, labels, clicked);

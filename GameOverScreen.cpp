@@ -1,5 +1,6 @@
 #include "GameOverScreen.h"
 #include <SFML/Graphics.hpp>
+#include "SoundManager.h"
 #include <string>
 using namespace std;
 #include <iostream>
@@ -69,7 +70,8 @@ void GameOverScreen :: drawExitScreen(sf::RenderWindow& window, int score1, int 
                 if (buttonBounds.contains(mousePos)) 
                 {
                     clicked = true;
-                    timer.restart();    
+                    timer.restart();   
+                    SoundManager::get().playSound("click"); 
                     quitPressed=true;
                 }
 
@@ -96,6 +98,7 @@ void GameOverScreen :: drawExitScreen(sf::RenderWindow& window, int score1, int 
         window.draw(buttonText);
         
         window.display();
+        SoundManager::get().update();
 
         if(quitPressed){
             return;
