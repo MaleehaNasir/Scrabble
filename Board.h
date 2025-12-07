@@ -5,6 +5,8 @@ using namespace std;
 class Board{
 
     BoardSquares grid[15][15];
+    char lettersGrid[15][15];
+
 
     public:
     Board();
@@ -15,7 +17,7 @@ class Board{
     char getLetter(int row, int col);
     bool isEmpty(int row, int col) const;
     void setEmpty(int row, int col, bool e); 
-
+    
     
     
 

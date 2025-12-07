@@ -7,6 +7,7 @@
 #include "Board.h"
 #include "Player.h"
 #include "LetterBag.h"
+#include "Move.h"
 
 using namespace std;
 
@@ -26,6 +27,9 @@ class Game
     sf::Vector2f rackPositions[7];
     sf::RectangleShape boardTiles[225];
     sf::Clock timer[4];
+    bool isFirstMove=true;
+    Move currentMove;
+    sf::Sprite permanentTileSprites[15][15];
         
     void scoreDisplay(sf::RenderWindow &window);
     void rackDisplay(sf::RenderWindow &window);
@@ -45,6 +49,7 @@ class Game
     void drawGameScreen(sf::RenderWindow& window);
     void loadTextures();
     vector<int> getFinalScores();
+    void submitMove();
 
     
 };

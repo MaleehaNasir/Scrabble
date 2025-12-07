@@ -42,8 +42,16 @@ Board::Board()
                 grid[i][j]=BoardSquares(2, DL, true, p, sf::Color::Yellow);
             }
 
+            else if (i==j==7)
+            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color::Red);}
+
             else
             {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(223,223,225));}
+
+
+            lettersGrid[i][j]='\0';
+
+
     
         }
 

@@ -32,6 +32,9 @@ void Game:: switchPlayer()
 
 }
 
+void Game::submitMove()
+{cout<<"Implement submit move here";}
+
 void Game::playerDisplay(sf::RenderWindow &window)
 {
 
@@ -69,6 +72,12 @@ Game::Game() : Player1(), Player2(), gameBoard(), tileBag()
     for (int i =0; i<7; i++){isDragging[i] = false;}
 
     for (int i =0; i<4; i++){clicked[i] = false;};
+
+    for (int i =0; i<15;i++)
+    {
+        for (int j =0; j<15;j++)
+        {permanentTileSprites[i][j]=sf::Sprite();}
+    }
 
     int b_start_x=20;
     int b_start_y=780;
@@ -182,10 +191,37 @@ void Game::processEvents(sf::RenderWindow &window)
                 for (int i=0; i<currentPlayer->getRack().size();i++)
                 {
                     sf::FloatRect rackLetterBounds = currentPlayer->getRack()[i]->getSprite().getGlobalBounds();
-                    if (rackLetterBounds.contains(mousePos)) //TODO: add the and if empty 
+                    if (rackLetterBounds.contains(mousePos)) 
                     {
+                        sf::Vector2f tilePos = currentPlayer->getRack()[i]->getSprite().getPosition();
                         isDragging[i]=true;
                         dragOffset[i]=  mousePos-currentPlayer->getRack()[i]->getSprite().getPosition();
+
+                        for (int a = 0; a < 225; a++)
+                        {
+                            int row = a / 15;
+                            int col = a % 15;
+
+                            sf::Vector2f boardTilePos = boardTiles[a].getPosition();
+                            
+                            if (tilePos==boardTilePos)
+                            {
+                                for (auto it = currentMove.tempPlacedTiles.begin(); it != currentMove.tempPlacedTiles.end(); ++it)
+                                {
+                                    if (it->row == row && it->col == col)
+                                    {
+                                        currentMove.tempPlacedTiles.erase(it);
+                                        gameBoard.setEmpty(row, col, true); // Mark board position as empty
+                                        break;
+                                    }
+                                }
+                                break; 
+                            }
+
+                        }
+                
+                
+                        
                     }
 
                 }
@@ -200,9 +236,9 @@ void Game::processEvents(sf::RenderWindow &window)
                         std::cout << labels[i] << " clicked! TODO: Add game." << labels[i] << "();" << std::endl;
                         switch (i) 
                         {
-                            // case 0:  //submit
-                            //     currentPlayer->getRack()=game.Swap(currentPlayer->getRack());  // Or whatever your method is
-                            //     break;
+                            case 0:  //submit
+                                submitMove();
+                                break;
                             case 1: //swap
                                 switchPlayer();
                                 break;
@@ -243,6 +279,12 @@ void Game::processEvents(sf::RenderWindow &window)
                                 {
                                     currentPlayer->getRack()[i]->getSprite().setPosition(boardTiles[a].getPosition()); 
                                     gameBoard.setEmpty(row, col, false);
+                                    tilesPlaced tempTile;
+                                    tempTile.row=row;
+                                    tempTile.col=col;
+                                    tempTile.letter=currentPlayer->getRack()[i]->getLetter();
+                                    currentMove.tempPlacedTiles.push_back(tempTile);
+            
                                     break;
                                 }
                                 else 
@@ -269,7 +311,7 @@ void Game::processEvents(sf::RenderWindow &window)
             
         }
 
-        
+            
 }
 
 void Game::update()
@@ -327,4 +369,6 @@ void Game::drawGameScreen(sf::RenderWindow &window)
         render(window);
         
     }
+    for (int i=0; i<currentMove.tempPlacedTiles.size();i++){cout<<currentMove.tempPlacedTiles[i].letter<<endl;}
+        
 }
