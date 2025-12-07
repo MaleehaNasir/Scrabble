@@ -58,6 +58,8 @@ char Board::getLetter(int row, int col)
 
 bool Board::isEmpty(int row, int col) const {return grid[row][col].isEmpty();}
 
+
+
 string Board::getTypeText(BoardSquares &square)
 {
 
@@ -87,5 +89,7 @@ sf::RectangleShape Board:: getTileInfo(int row, int col)
     return square;
 
 }
+
+void Board::setEmpty(int row, int col, bool e){grid[row][col].setEmpty(e);}
 
 

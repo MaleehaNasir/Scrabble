@@ -215,17 +215,18 @@ void Game::drawGameScreen(sf::RenderWindow &window)
                             sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
                             for (int a=0; a<225;a++)
                             {
+                                int row = a / 15;  
+                                int col = a % 15;
+
                                 sf::FloatRect boardTileBounds = boardTiles[a].getGlobalBounds();
-                                if (boardTileBounds.contains(mousePos)&&boardTiles[a].isEmpty()) 
+                                if (boardTileBounds.contains(mousePos)&& gameBoard.isEmpty(row, col)) 
                                 {
                                     currentRack[i]->getSprite().setPosition(boardTiles[a].getPosition()); 
-                                    int row = a / 15;  
-                                    int col = a % 15;
-                                    boardTiles[a].setEmpty(false);
+                                    gameBoard.setEmpty(row, col, false);
                                     break;
                                 }
                                 else 
-                                {currentRack[i]->getSprite().setPosition(rackPositions[i]); boardTiles[a].setEmpty(true);}
+                                {currentRack[i]->getSprite().setPosition(rackPositions[i]); gameBoard.setEmpty(row, col, true);}
                             }
                         }
                         isDragging[i] = false;
