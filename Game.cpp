@@ -32,12 +32,12 @@ void Game:: switchPlayer()
 
 }
 
-void Game::playerDisplay(sf::RenderWindow &window, sf::Font& font, int player)
+void Game::playerDisplay(sf::RenderWindow &window)
 {
 
     sf::Text currPlayerLabel = sf::Text("Currently Playing: ", font, 28);
     sf::Text currPlayer("", font, 26);
-    if (player ==1) currPlayer.setString("Player 1");
+    if (currentPlayer==&Player1) currPlayer.setString("Player 1");
     else currPlayer.setString("Player 2");
     
 
@@ -103,7 +103,7 @@ vector<int> Game::getFinalScores() //to pass to gameover screen so that players 
     return scores;
 }
 
-void Game::buttonDisplay(sf::RenderWindow &window, sf::Font& font, sf::RectangleShape buttons[4], string labels[4], bool clicked[4])
+void Game::buttonDisplay(sf::RenderWindow &window)
 {
        
     for (int i =0; i<4; i++)
@@ -125,12 +125,12 @@ void Game::buttonDisplay(sf::RenderWindow &window, sf::Font& font, sf::Rectangle
         }
 }
 
-void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font& font, int score1, int score2)
+void Game:: scoreDisplay(sf::RenderWindow &window)
 {
     sf::Text player1 = sf::Text("Player 1: ", font, 24);
-    sf::Text score1_display = sf::Text(to_string(score1), font, 24);
+    sf::Text score1_display = sf::Text(to_string(Player1.getScore()), font, 24);
     sf::Text player2 = sf::Text("Player 2: ", font, 24);
-    sf::Text score2_display = sf::Text(to_string(score2), font, 24);
+    sf::Text score2_display = sf::Text(to_string(Player2.getScore()), font, 24);
     sf::Text label = sf::Text("PLAYER SCORES", font, 30);
 
     score1_display.setFillColor(sf::Color::White);
@@ -153,12 +153,12 @@ void Game:: scoreDisplay(sf::RenderWindow &window, sf::Font& font, int score1, i
 
 }
 
-void Game:: rackDisplay(sf::RenderWindow &window, sf::Font& font, vector<LetterTiles*>&rackLetters)
+void Game:: rackDisplay(sf::RenderWindow &window)
 {
 
-    for (int i=0; i<rackLetters.size(); i++)
+    for (int i=0; i<currentPlayer->getRack().size(); i++)
     {
-        sf::Sprite& s = rackLetters[i]->getSprite();
+        sf::Sprite& s = currentPlayer->getRack()[i]->getSprite();
         window.draw(s);
     }
 }
@@ -307,11 +307,10 @@ void Game::render(sf::RenderWindow &window)
         }
 
         
-        scoreDisplay(window, font, Player1.getScore(), Player2.getScore());
-        rackDisplay(window, font, currentPlayer->getRack());
-        buttonDisplay(window, font, buttons, labels, clicked);
-        int p = currentPlayer==&Player1?1:2; //pass 1 if player one playing else player 2
-        playerDisplay(window, font, p);
+        scoreDisplay(window);
+        rackDisplay(window);
+        buttonDisplay(window);
+        playerDisplay(window);
 
         
         window.display();
@@ -323,7 +322,9 @@ void Game::drawGameScreen(sf::RenderWindow &window)
     while(window.isOpen())
     {
         processEvents(window);
+        if (resignPressed){return;}
         update();      
         render(window);
+        
     }
 }

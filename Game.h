@@ -27,11 +27,10 @@ class Game
     sf::RectangleShape boardTiles[225];
     sf::Clock timer[4];
         
-    void scoreDisplay(sf::RenderWindow &window, sf::Font& font, int score1, int score2);
-    void boardDisplay(sf::RenderWindow &window, sf::Font& font, vector<string> &boardDimensions, sf::RectangleShape rectangle[255]);
-    void rackDisplay(sf::RenderWindow &window, sf::Font& font, vector<LetterTiles*>&rackLetters);
-    void buttonDisplay(sf::RenderWindow &window, sf::Font& font, sf::RectangleShape buttons[4], string labels[4], bool clicked[4]);
-    void playerDisplay(sf::RenderWindow &window, sf::Font& font, int player);
+    void scoreDisplay(sf::RenderWindow &window);
+    void rackDisplay(sf::RenderWindow &window);
+    void buttonDisplay(sf::RenderWindow &window);
+    void playerDisplay(sf::RenderWindow &window);
     void switchPlayer();
     void validateWord();
     void update();
