@@ -33,7 +33,10 @@ void Game:: switchPlayer()
 }
 
 void Game::submitMove()
-{cout<<"Implement submit move here";}
+{
+    
+    
+}
 
 void Game::playerDisplay(sf::RenderWindow &window)
 {
@@ -240,7 +243,7 @@ void Game::processEvents(sf::RenderWindow &window)
                                 submitMove();
                                 break;
                             case 1: //swap
-                                switchPlayer();
+                                //swaptilesfunction implement karo 
                                 break;
                             
                             case 2:  // Resign
@@ -368,7 +371,5 @@ void Game::drawGameScreen(sf::RenderWindow &window)
         update();      
         render(window);
         
-    }
-    for (int i=0; i<currentMove.tempPlacedTiles.size();i++){cout<<currentMove.tempPlacedTiles[i].letter<<endl;}
-        
+    }        
 }
