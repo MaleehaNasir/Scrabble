@@ -36,11 +36,15 @@ class Game
     void buttonDisplay(sf::RenderWindow &window);
     void playerDisplay(sf::RenderWindow &window);
     void switchPlayer();
-    void validateWord();
     void update();
     void render(sf::RenderWindow &window);
     void processEvents(sf::RenderWindow &window);
-    
+
+    void validateMove();
+    bool allTilesAdjacent();
+    bool allTilesConnected();
+    vector<string> returnFormedWords();
+    bool checkInDictionary(); 
 
     public:
     Game();

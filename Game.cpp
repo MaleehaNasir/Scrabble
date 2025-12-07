@@ -32,11 +32,58 @@ void Game:: switchPlayer()
 
 }
 
+// void Game::validateMove()
+// {
+//     if (isFirstMove)
+//     {
+//         //implement logic for first move regarding center
+//     }
+
+//     else 
+//     return (allTilesAdjacent() && allTilesConnected() && returnFormedWords().size>0 && checkInDictionary)
+// }
+
 void Game::submitMove()
 {
-    
-    
+    if (currentMove.tempPlacedTiles.empty())
+    return;
+
+    for (int i =0; i<currentMove.tempPlacedTiles.size();i++)
+    {
+        int r = currentMove.tempPlacedTiles[i].row;
+        int c = currentMove.tempPlacedTiles[i].col;
+        char l = currentMove.tempPlacedTiles[i].letter;
+
+        gameBoard.setLetter(r, c, l);
+        
+        int textureIndex = l - 'A';
+        permanentTileSprites[r][c].setTexture(tilesKeTextures[textureIndex]);
+        permanentTileSprites[r][c].setScale(0.8f, 0.8f);
+        permanentTileSprites[r][c].setPosition(boardTiles[r*15 +c].getPosition());
+    }
+
+    for (int i =0; i<currentMove.tempPlacedTiles.size(); i++)
+    {
+        char placedletter=currentMove.tempPlacedTiles[i].letter;
+
+        for (int j =0; j<currentPlayer->getRack().size(); j++)
+        {
+            if (currentPlayer->getRack()[j]->getLetter()==placedletter)
+            {currentPlayer->getRack().erase(currentPlayer->getRack().begin()+j); break;}
+        }
+    }
+
+    currentPlayer->fillRack(tileBag, tilesKeTextures);
+    currentMove.tempPlacedTiles.clear();
+
+    for (int i = 0; i < currentPlayer->getRack().size(); i++) 
+    {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
+
+    switchPlayer();
+
 }
+
+
 
 void Game::playerDisplay(sf::RenderWindow &window)
 {
@@ -272,6 +319,8 @@ void Game::processEvents(sf::RenderWindow &window)
                         if (isDragging[i])
                         {
                             sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+                            bool placed = false;
+
                             for (int a=0; a<225;a++)
                             {
                                 int row = a / 15;  
@@ -287,12 +336,13 @@ void Game::processEvents(sf::RenderWindow &window)
                                     tempTile.col=col;
                                     tempTile.letter=currentPlayer->getRack()[i]->getLetter();
                                     currentMove.tempPlacedTiles.push_back(tempTile);
-            
+                                    placed=true;
+
                                     break;
                                 }
-                                else 
-                                {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]); gameBoard.setEmpty(row, col, true);}
                             }
+
+                            if (!placed){currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
                         }
                         isDragging[i] = false;
                     }
@@ -338,16 +388,8 @@ void Game::render(sf::RenderWindow &window)
                 sf::RectangleShape tile = gameBoard.getTileInfo(i, j);
                 window.draw(tile);
 
-                // if (!gameBoard.isEmpty(i, j)) 
-                // {
-                // sf::Text letterText;
-                // letterText.setFont(font);   // font loaded earlier
-                // letterText.setString(std::string(1, gameBoard.getLetter(i, j)));
-                // letterText.setCharacterSize(24);
-                // letterText.setFillColor(sf::Color::Black);
-                // letterText.setPosition(tile.getPosition().x + 10, tile.getPosition().y + 5);
-                // window.draw(letterText);
-                // }
+                if (!gameBoard.isEmpty(i, j))  
+                {window.draw(permanentTileSprites[i][j]);}
             }
         }
 

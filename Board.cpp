@@ -17,36 +17,36 @@ Board::Board()
             p.x=start_x+(j*44.f);
             p.y=start_y+(i*44.f);
             
+            if (i==7&&j==7) //CENTER
+            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(110,110,110));}
+
             //TRIPLE WORD
-            if((i==0&&(j==0||j==7||j==14))   ||   (i==7&&(j==0||j==14))   || (i==14&&(j==0||j==7||j==14)))
+            else if((i==0&&(j==0||j==7||j==14))   ||   (i==7&&(j==0||j==14))   || (i==14&&(j==0||j==7||j==14)))
             {
-                grid[i][j]=BoardSquares(3, TW, true, p, sf::Color::Red);
+                grid[i][j]=BoardSquares(3, TW, true, p, sf::Color(133,33,33));
 
             }
 
             //DOUBLE WORD
             else if ((i==j && ((i>=1 && i<=4)||(i>=10 && i<=14)))   ||   (i==14-j && ((i>=1 && i<=4)||(i>=10 && i<=14))))
             {
-                grid[i][j]=BoardSquares(2, DW, true, p, sf::Color::Magenta);
+                grid[i][j]=BoardSquares(2, DW, true, p, sf::Color(182, 101, 96));
             }
 
             //TRIPLE LETTER
             else if (((i==5||i==9) && (j == 1 || j == 13 || j==5||j==9))   ||   ((i==1||i==13)&&(j==5||j==9)))
             {
-                grid[i][j]=BoardSquares(3, TL, true, p, sf::Color::Cyan);
+                grid[i][j]=BoardSquares(3, TL, true, p, sf::Color(24, 45, 109));
             }
 
             //DOUBLE LETTER
             else if (((i==0 || i==14)&&(j==3||j==11))   ||   ((i==6||i==8)&&(j==2||j==6||j==8||j==12))   ||   ((i==3 || i==11)&&(j==0 || j == 7 || j == 14))    ||    ((i==2 || i ==12)&&(j==6 || j==8))    ||   ((i==7)&&(j==11||j==3)))
             {
-                grid[i][j]=BoardSquares(2, DL, true, p, sf::Color::Yellow);
+                grid[i][j]=BoardSquares(2, DL, true, p, sf::Color(76, 98, 132));
             }
 
-            else if (i==j==7)
-            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color::Red);}
-
             else
-            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(223,223,225));}
+            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(121, 139, 127));}
 
 
             lettersGrid[i][j]='\0';
