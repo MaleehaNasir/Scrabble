@@ -1,4 +1,4 @@
-#include "dictionary.h"
+#include "Dictionary.h"
 #include <fstream>
 #include <iostream>
 using namespace std;
@@ -36,7 +36,7 @@ bool Dictionary::loadDictionary(string filename) {
 }
 
 bool Dictionary::ValidWord(string word) { 
-    if (wordCount == 0) {
+    if (wordCount <2) {
         return false;
     }
     if (word.empty() || word.length() > 15) { 

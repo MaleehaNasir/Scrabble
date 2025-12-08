@@ -3,10 +3,13 @@
 #include <SFML/Graphics.hpp>
 using namespace std;
 #include <iostream>
+#include <set>
+#include <fstream>
 
 sf::Texture tilesKeTextures[27];
 sf::Sprite rackSprites[7];
 
+//             INITIALIZATIONS
 
 void Game::loadTextures()//load all the textures for the sprites
 {
@@ -21,94 +24,18 @@ void Game::loadTextures()//load all the textures for the sprites
     tilesKeTextures[26].loadFromFile("letterTiles/Blank.png");
 }
 
-void Game:: switchPlayer()
+int Game::getLetterValue(char letter) 
 {
-    currentPlayer=(currentPlayer==&Player1)?&Player2 : &Player1;
 
-    currentPlayer->getRack() = currentPlayer->getRack();
+    LetterTiles tletter(letter);
+    return tletter.getLetterPoints();
     
-    for (int i = 0; i < currentPlayer->getRack().size(); i++)
-    {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
-
-
 }
 
-// void Game::validateMove()
-// {
-//     if (isFirstMove)
-//     {
-//         //implement logic for first move regarding center
-//     }
-
-//     else 
-//     return (allTilesAdjacent() && allTilesConnected() && returnFormedWords().size>0 && checkInDictionary)
-// }
-
-void Game::submitMove()
-{
-    if (currentMove.tempPlacedTiles.empty())
-    return;
-
-    for (int i =0; i<currentMove.tempPlacedTiles.size();i++)
-    {
-        int r = currentMove.tempPlacedTiles[i].row;
-        int c = currentMove.tempPlacedTiles[i].col;
-        char l = currentMove.tempPlacedTiles[i].letter;
-
-        gameBoard.setLetter(r, c, l);
-        
-        int textureIndex = l - 'A';
-        permanentTileSprites[r][c].setTexture(tilesKeTextures[textureIndex]);
-        permanentTileSprites[r][c].setScale(0.8f, 0.8f);
-        permanentTileSprites[r][c].setPosition(boardTiles[r*15 +c].getPosition());
-    }
-
-    for (int i =0; i<currentMove.tempPlacedTiles.size(); i++)
-    {
-        char placedletter=currentMove.tempPlacedTiles[i].letter;
-
-        for (int j =0; j<currentPlayer->getRack().size(); j++)
-        {
-            if (currentPlayer->getRack()[j]->getLetter()==placedletter)
-            {currentPlayer->getRack().erase(currentPlayer->getRack().begin()+j); break;}
-        }
-    }
-
-    currentPlayer->fillRack(tileBag, tilesKeTextures);
-    currentMove.tempPlacedTiles.clear();
-
-    for (int i = 0; i < currentPlayer->getRack().size(); i++) 
-    {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
-
-    switchPlayer();
-
-}
-
-
-
-void Game::playerDisplay(sf::RenderWindow &window)
-{
-
-    sf::Text currPlayerLabel = sf::Text("Currently Playing: ", font, 28);
-    sf::Text currPlayer("", font, 26);
-    if (currentPlayer==&Player1) currPlayer.setString("Player 1");
-    else currPlayer.setString("Player 2");
-    
-
-    currPlayerLabel.setFillColor(sf::Color::White);
-    currPlayer.setFillColor(sf::Color::White);
-
-    currPlayerLabel.setPosition(740,350);
-    currPlayer.setPosition(780, 400);
-
-    window.draw(currPlayerLabel);
-    window.draw(currPlayer);
-
-}
-
-Game::Game() : Player1(), Player2(), gameBoard(), tileBag()
+Game::Game() : Player1(), Player2(), gameBoard(), tileBag(), dictionary()
 {
     loadTextures();
+    dictionary.loadDictionary("dictionary.txt");
 
     Player1.fillRack(tileBag, tilesKeTextures);
     Player2.fillRack(tileBag, tilesKeTextures);
@@ -153,6 +80,450 @@ Game::Game() : Player1(), Player2(), gameBoard(), tileBag()
         rackPositions[i] = sf::Vector2f(r_start_x + i*45, r_start_y);
         currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);  // Set initial position
     }
+}
+
+void Game:: switchPlayer()
+{
+    currentPlayer=(currentPlayer==&Player1)?&Player2 : &Player1;
+
+    currentPlayer->getRack() = currentPlayer->getRack();
+    
+    for (int i = 0; i < currentPlayer->getRack().size(); i++)
+    {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
+
+
+}
+
+bool Game::isFirstMove() 
+{
+    for (int i = 0; i < 15; i++) 
+    {
+        for (int j = 0; j < 15; j++) 
+        {
+            if (permanentTileSprites[i][j].getTexture() != nullptr)
+            {
+                return false;
+            }
+        }
+    }
+    return true; 
+}
+
+bool Game::allTilesAdjacent()
+{
+    if (currentMove.tempPlacedTiles.size()<=1){return true;}
+
+    bool sameRow=true;
+    int firstRow=currentMove.tempPlacedTiles[0].row;
+
+    for (int i =0; i<currentMove.tempPlacedTiles.size();i++)
+    {if (currentMove.tempPlacedTiles[i].row!=firstRow) {sameRow=false; break;}}
+
+    bool sameCol=true;
+    int firstCol=currentMove.tempPlacedTiles[0].col;
+
+    for (int i =0; i<currentMove.tempPlacedTiles.size();i++)
+    {if (currentMove.tempPlacedTiles[i].col!=firstCol) {sameCol=false; break;}}
+
+    return sameCol||sameRow;
+
+}
+
+bool Game::allTilesConnected()
+{
+    for (int i =0; i<currentMove.tempPlacedTiles.size(); i++)
+    {
+        int row=currentMove.tempPlacedTiles[i].row;
+        int col=currentMove.tempPlacedTiles[i].col;
+
+        if (row > 0 && !gameBoard.isEmpty(row - 1, col)) {return true;}
+       
+        if (row < 14 && !gameBoard.isEmpty(row + 1, col)) {return true;}
+        
+        if (col > 0 && !gameBoard.isEmpty(row, col-1)) {return true;}
+       
+        if (col < 14 && !gameBoard.isEmpty(row, col+1)) {return true;}
+    }
+    
+    return false;
+    
+}
+
+vector<string> Game::returnFormedWords()
+{
+    vector<string> words;
+
+    for (const auto& tile : currentMove.tempPlacedTiles) 
+    {
+        gameBoard.setLetter(tile.row, tile.col, tile.letter);
+        gameBoard.setEmpty(tile.row, tile.col, false);
+    }
+    
+    bool horizontal = true;
+    
+    if (currentMove.tempPlacedTiles.size() > 1) 
+    {horizontal = (currentMove.tempPlacedTiles[0].row == currentMove.tempPlacedTiles[1].row);}
+    
+    else 
+    {
+        int r = currentMove.tempPlacedTiles[0].row;
+        int c = currentMove.tempPlacedTiles[0].col;
+        
+        bool hasHorizontalNeighbor = 
+            (c > 0 && !gameBoard.isEmpty(r, c - 1)) || 
+            (c < 14 && !gameBoard.isEmpty(r, c + 1));
+        
+        horizontal = hasHorizontalNeighbor;
+    }
+    
+    if (horizontal) 
+    {
+        int row = currentMove.tempPlacedTiles[0].row;
+        int minCol = 15, maxCol = 0;
+        
+        for (const auto& tile : currentMove.tempPlacedTiles) 
+        {
+            minCol = min(minCol, tile.col);
+            maxCol = max(maxCol, tile.col);
+        }
+        
+        while (minCol > 0 && !gameBoard.isEmpty(row, minCol - 1)) 
+        {
+            minCol--;
+        }
+        
+        while (maxCol < 14 && !gameBoard.isEmpty(row, maxCol + 1)) 
+        {
+            maxCol++;
+        }
+        
+        string word = "";
+        for (int col = minCol; col <= maxCol; col++) 
+        {
+            word += gameBoard.getLetter(row, col);
+        }
+        
+        if (word.length() > 1) 
+        {
+            words.push_back(word);
+        }
+    } 
+    else 
+    {
+        int col = currentMove.tempPlacedTiles[0].col;
+        int minRow = 15, maxRow = 0;
+        
+        for (const auto& tile : currentMove.tempPlacedTiles) 
+        {
+            minRow = min(minRow, tile.row);
+            maxRow = max(maxRow, tile.row);
+        }
+        
+        while (minRow > 0 && !gameBoard.isEmpty(minRow - 1, col)) 
+        {
+            minRow--;
+        }
+        
+        while (maxRow < 14 && !gameBoard.isEmpty(maxRow + 1, col)) 
+        {
+            maxRow++;
+        }
+        
+        string word = "";
+        for (int row = minRow; row <= maxRow; row++) 
+        {
+            word += gameBoard.getLetter(row, col);
+        }
+        
+        if (word.length() > 1) 
+        {
+            words.push_back(word);
+        }
+    }
+    
+    for (const auto& tile : currentMove.tempPlacedTiles) 
+    {
+        gameBoard.setEmpty(tile.row, tile.col, true);
+    }
+    
+    return words;
+}
+
+bool Game::checkInDictionary(const string& word)
+{
+    string capitalWord=word;
+    for (int i = 0; i < capitalWord.length(); i++)
+    {capitalWord[i] = toupper(capitalWord[i]);}
+
+    return dictionary.ValidWord(capitalWord);
+}
+
+
+int Game::calculateScore()
+{
+    int totalScore = 0;
+        
+    vector<string> formedWords = returnFormedWords();
+    
+    for (int i = 0; i < formedWords.size(); i++)
+    {
+        string word = formedWords[i];
+        int wordScore = 0;
+        int wordMultiplier = 1;  
+        
+        
+        bool horizontal = true;
+        if (currentMove.tempPlacedTiles.size() > 1)
+        {
+            horizontal = (currentMove.tempPlacedTiles[0].row == currentMove.tempPlacedTiles[1].row);
+        }
+        
+        int startRow, startCol;
+        
+        if (horizontal)
+        {
+            startRow = currentMove.tempPlacedTiles[0].row;
+            startCol = currentMove.tempPlacedTiles[0].col;
+            
+            while (startCol > 0 && !gameBoard.isEmpty(startRow, startCol - 1))
+            {
+                startCol--;
+            }
+            
+            for (int j = 0; j < word.length(); j++)
+            {
+                char letter = word[j];
+                int letterValue = getLetterValue(letter);
+                int letterMultiplier = 1;  
+                
+                int currentRow = startRow;
+                int currentCol = startCol + j;
+                
+                bool justPlaced = false;
+                for (int k = 0; k < currentMove.tempPlacedTiles.size(); k++)
+                {
+                    if (currentMove.tempPlacedTiles[k].row == currentRow && 
+                        currentMove.tempPlacedTiles[k].col == currentCol)
+                    {
+                        justPlaced = true;
+                        
+                        square_type sqType = gameBoard.getSquareType(currentRow, currentCol);
+                        
+                        if (sqType == DL)
+                        {
+                            letterMultiplier = 2;
+                        }
+                        else if (sqType == TL)
+                        {
+                            letterMultiplier = 3;
+                        }
+                        else if (sqType == DW)
+                        {
+                            wordMultiplier *= 2;
+                        }
+                        else if (sqType == TW)
+                        {
+                            wordMultiplier *= 3;
+                        }
+
+                        break;
+                    }
+                }
+                                
+                wordScore += letterValue * letterMultiplier;
+            }
+        }
+        else
+        {
+            startRow = currentMove.tempPlacedTiles[0].row;
+            startCol = currentMove.tempPlacedTiles[0].col;
+            
+            while (startRow > 0 && !gameBoard.isEmpty(startRow - 1, startCol))
+            {
+                startRow--;
+            }
+            
+            for (int j = 0; j < word.length(); j++)
+            {
+                char letter = word[j];
+                int letterValue = getLetterValue(letter);
+                int letterMultiplier = 1;
+                
+                int currentRow = startRow + j;
+                int currentCol = startCol;
+                
+                bool justPlaced = false;
+                for (int k = 0; k < currentMove.tempPlacedTiles.size(); k++)
+                {
+                    if (currentMove.tempPlacedTiles[k].row == currentRow && 
+                        currentMove.tempPlacedTiles[k].col == currentCol)
+                    {
+                        justPlaced = true;
+                        
+                        square_type sqType = gameBoard.getSquareType(currentRow, currentCol);
+                        
+                        if (sqType == DL)
+                        {
+                            letterMultiplier = 2;
+                        }
+                        else if (sqType == TL)
+                        {
+                            letterMultiplier = 3;
+                        }
+                        else if (sqType == DW)
+                        {
+                            wordMultiplier *= 2;
+                        }
+                        else if (sqType == TW)
+                        {
+                            wordMultiplier *= 3;
+                        }
+                        
+                        
+                        break;
+                    }
+                }
+                
+                
+                wordScore += letterValue * letterMultiplier;
+            }
+        }
+        
+        wordScore *= wordMultiplier;
+        totalScore += wordScore;
+    }
+    
+    if (currentMove.tempPlacedTiles.size() == 7)
+    {
+        totalScore += 50;
+    }
+    
+    return totalScore;
+}
+
+
+bool Game::validateMove()
+{
+    if (isFirstMove())
+    {
+        bool tileOnCenter=false;
+
+        for (int i =0; i<currentMove.tempPlacedTiles.size(); i++)
+        {
+            if (currentMove.tempPlacedTiles[i].row==7 && currentMove.tempPlacedTiles[i].col==7)
+            {
+                tileOnCenter=true;
+                break;
+            }
+        }
+
+        if (tileOnCenter==false){return false;}
+    }
+    else
+    {
+        if(allTilesConnected()==false){return false;}
+    }
+
+    if (allTilesAdjacent()==false){return false;}
+
+    vector<string>formedWords=returnFormedWords();
+
+    if (formedWords.empty()){return false;}
+
+    for (int i =0; i<formedWords.size(); i++)
+    {
+        if (checkInDictionary(formedWords[i])==false){return false;}
+    }
+
+
+    return true;
+}
+
+void Game::submitMove()
+{
+    if (currentMove.tempPlacedTiles.empty())
+    return;
+
+    if(!validateMove()){cout<<"Invalid Move"<<endl; return;}
+
+    int score = calculateScore();
+    currentPlayer->incScore(score);
+
+    for (int i =0; i<currentMove.tempPlacedTiles.size();i++)
+    {
+        int r = currentMove.tempPlacedTiles[i].row;
+        int c = currentMove.tempPlacedTiles[i].col;
+        char l = currentMove.tempPlacedTiles[i].letter;
+
+        gameBoard.setLetter(r, c, l);
+        
+        int textureIndex = l - 'A';
+        permanentTileSprites[r][c].setTexture(tilesKeTextures[textureIndex]);
+        permanentTileSprites[r][c].setScale(0.8f, 0.8f);
+        permanentTileSprites[r][c].setPosition(boardTiles[r*15 +c].getPosition());
+    }
+
+    for (int i =0; i<currentMove.tempPlacedTiles.size(); i++)
+    {
+        char placedletter=currentMove.tempPlacedTiles[i].letter;
+
+        for (int j =0; j<currentPlayer->getRack().size(); j++)
+        {
+            if (currentPlayer->getRack()[j]->getLetter()==placedletter)
+            {currentPlayer->getRack().erase(currentPlayer->getRack().begin()+j); break;}
+        }
+    }
+
+    currentPlayer->fillRack(tileBag, tilesKeTextures);
+    currentMove.tempPlacedTiles.clear();
+
+    for (int i = 0; i < currentPlayer->getRack().size(); i++) 
+    {currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);}
+
+    switchPlayer();
+
+}
+
+void Game::swapTiles()
+{
+    
+    for (int i = 0; i < currentPlayer->getRack().size(); i++)
+    {
+        LetterTiles* tile = currentPlayer->getRack()[i];
+        tileBag.returnTile(tile);  
+    }
+    
+    
+    currentPlayer->getRack().clear();
+    
+    currentPlayer->fillRack(tileBag, tilesKeTextures);
+    
+    for (int i = 0; i < currentPlayer->getRack().size(); i++) 
+    {
+        currentPlayer->getRack()[i]->getSprite().setPosition(rackPositions[i]);
+    }
+    
+    switchPlayer();
+}
+
+void Game::playerDisplay(sf::RenderWindow &window)
+{
+
+    sf::Text currPlayerLabel = sf::Text("Currently Playing: ", font, 28);
+    sf::Text currPlayer("", font, 26);
+    if (currentPlayer==&Player1) currPlayer.setString("Player 1");
+    else currPlayer.setString("Player 2");
+    
+
+    currPlayerLabel.setFillColor(sf::Color::White);
+    currPlayer.setFillColor(sf::Color::White);
+
+    currPlayerLabel.setPosition(740,350);
+    currPlayer.setPosition(780, 400);
+
+    window.draw(currPlayerLabel);
+    window.draw(currPlayer);
+
 }
 
 vector<int> Game::getFinalScores() //to pass to gameover screen so that players can stay private otherwise 
@@ -293,7 +664,7 @@ void Game::processEvents(sf::RenderWindow &window)
                                 SoundManager::get().playSound("submit_ok", 85.f);
                                 break;
                             case 1: //swap
-                                //swaptilesfunction implement karo 
+                                swapTiles(); 
                                 SoundManager::get().playSound("swap",80.f);
                                 break;
                             

@@ -18,7 +18,7 @@ Board::Board()
             p.y=start_y+(i*44.f);
             
             if (i==7&&j==7) //CENTER
-            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(182, 101, 96, 220));}
+            {grid[i][j]=BoardSquares(1, NORMAL, true, p, sf::Color(76, 98, 132));}
 
             //TRIPLE WORD
             else if((i==0&&(j==0||j==7||j==14))   ||   (i==7&&(j==0||j==14))   || (i==14&&(j==0||j==7||j==14)))
@@ -66,18 +66,8 @@ char Board::getLetter(int row, int col)
 
 bool Board::isEmpty(int row, int col) const {return grid[row][col].isEmpty();}
 
-
-
-string Board::getTypeText(BoardSquares &square)
-{
-
-    if (square.getType()==TW){return "TW";}
-    else if (square.getType()==DW){return "DW";}
-    else if (square.getType()==TL){return "TL";}
-    else if (square.getType()==DL){return "DL";}
-    else return "";
-
-}
+square_type Board::getSquareType(int row, int col)
+{return grid[row][col].getType();}
 
 sf::RectangleShape Board:: getTileInfo(int row, int col)
 {

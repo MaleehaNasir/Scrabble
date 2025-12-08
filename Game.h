@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "LetterBag.h"
 #include "Move.h"
+#include "Dictionary.h"
 
 using namespace std;
 
@@ -15,6 +16,7 @@ class Game
 {
     LetterBag tileBag;
     Board gameBoard;
+    Dictionary dictionary;
     Player Player1;
     Player Player2;
     Player* currentPlayer;
@@ -27,9 +29,9 @@ class Game
     sf::Vector2f rackPositions[7];
     sf::RectangleShape boardTiles[225];
     sf::Clock timer[4];
-    bool isFirstMove=true;
     Move currentMove;
     sf::Sprite permanentTileSprites[15][15];
+    
         
     void scoreDisplay(sf::RenderWindow &window);
     void rackDisplay(sf::RenderWindow &window);
@@ -40,11 +42,15 @@ class Game
     void render(sf::RenderWindow &window);
     void processEvents(sf::RenderWindow &window);
 
-    void validateMove();
+    bool validateMove();
     bool allTilesAdjacent();
     bool allTilesConnected();
+    bool isFirstMove();
     vector<string> returnFormedWords();
-    bool checkInDictionary(); 
+    bool checkInDictionary(const string& word); 
+    int getLetterValue(char letter);
+    int calculateScore();
+    void swapTiles();
 
     public:
     Game();
