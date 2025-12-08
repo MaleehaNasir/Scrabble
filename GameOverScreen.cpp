@@ -4,8 +4,6 @@
 #include <string>
 using namespace std;
 #include <iostream>
-//NEEDS MASSIVE FIXINGGGG
-
 
 void GameOverScreen :: drawExitScreen(sf::RenderWindow& window, int score1, int score2)
 {
